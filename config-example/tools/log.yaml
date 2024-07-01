@@ -1,38 +1,30 @@
 logging:
-    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level: INFO
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     handlers:
         console:
             class: logging.StreamHandler
             level: DEBUG
         file:
-            backup_count: 10
             class: logging.FileHandler
-            filename: /var/log/app.log
             level: INFO
+            filename: /var/log/app.log
             max_bytes: 10485760
-    level: INFO
+            backup_count: 10
     loggers:
-        auth_service:
-            handlers:
-                - console
-                - file
-            level: DEBUG
+        web:
+            level: INFO
+            handlers: [console, file]
             propagate: true
-        database:
-            handlers:
-                - console
-                - file
-            level: WARNING
+        auth_service:
+            level: DEBUG
+            handlers: [console, file]
             propagate: true
         payment_service:
-            handlers:
-                - console
-                - file
             level: INFO
+            handlers: [console, file]
             propagate: true
-        web:
-            handlers:
-                - console
-                - file
-            level: INFO
+        database:
+            level: WARNING
+            handlers: [console, file]
             propagate: true

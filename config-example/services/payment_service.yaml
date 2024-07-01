@@ -1,29 +1,29 @@
 payment_service:
+    provider: PayPal
     api_endpoint: https://api.paypal.com
+    merchant_id: ABCD1234
     client_id: your_client_id
     client_secret: your_client_secret
     currency: USD
+    timeout: 10
+    retry_attempts: 3
     database:
-        host: "999"
+        host: db.payment.example.com
+        port: 5432
         name: payment_db
-        password: payment_password
-        port: "69"
         user: payment_user
+        password: payment_password
     logging:
-        file:
-            backup_count: 5
-            filename: /var/log/payment_service.log
-            max_bytes: 10485760
-        format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level: INFO
+        format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         handlers:
             - console
             - file
-        level: INFO
-    merchant_id: ABCD1234
+        file:
+            filename: /var/log/payment_service.log
+            max_bytes: 10485760
+            backup_count: 5
     monitoring:
         enabled: true
         endpoint: http://monitoring.example.com
         scrape_interval: 15s
-    provider: PayPal
-    retry_attempts: 3
-    timeout: 10

@@ -1,25 +1,22 @@
 monitoring:
-    alerts:
-        - expression: request_latency_seconds{quantile="0.9"} > 1
-          name: high_latency
-          severity: warning
-        - expression: up == 0
-          name: service_down
-          severity: critical
     enabled: true
-    endpoint: http://monitoring.example.com
-    metrics:
-        - labels:
-            - endpoint
-            - method
-          name: request_latency_seconds
-          type: histogram
-        - labels:
-            - source
-          name: error_count
-          type: counter
     provider: Prometheus
+    endpoint: http://monitoring.example.com
     scrape_interval: 15s
+    metrics:
+        - name: request_latency_seconds
+          type: histogram
+          labels: [endpoint, method]
+        - name: error_count
+          type: counter
+          labels: [source]
+    alerts:
+        - name: high_latency
+          expression: request_latency_seconds{quantile="0.9"} > 1
+          severity: warning
+        - name: service_down
+          expression: up == 0
+          severity: critical
     services:
         - web
         - auth_service

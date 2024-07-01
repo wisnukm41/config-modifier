@@ -1,26 +1,26 @@
 database:
+    host: db.staging.example.com
+    port: 5432
+    name: staging_db
+    user: staging_user
+    password: staging_password
+    pool_size: 10
+    max_connections: 50
+    ssl_mode: prefer
     backup:
+        schedule: "0 1 * * *"
         retention_days: 7
-        schedule: 0 1 * * *
-    host: "999"
     logging:
-        file:
-            backup_count: 5
-            filename: /var/log/db_stg.log
-            max_bytes: 10485760
-        format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level: WARNING
+        format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
         handlers:
             - console
             - file
-        level: WARNING
-    max_connections: 50
+        file:
+            filename: /var/log/db_stg.log
+            max_bytes: 10485760
+            backup_count: 5
     monitoring:
         enabled: true
         endpoint: http://monitoring.example.com
         scrape_interval: 15s
-    name: staging_db
-    password: staging_password
-    pool_size: 10
-    port: "69"
-    ssl_mode: prefer
-    user: staging_user
