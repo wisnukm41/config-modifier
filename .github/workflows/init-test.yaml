@@ -22,4 +22,5 @@ jobs:
               run: |
                 go build
                 ls
+                hellow
               working-directory: ./go-test
