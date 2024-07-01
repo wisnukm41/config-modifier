@@ -66,14 +66,14 @@ func updateYAMLFile(filepath string, key, value string) error {
 		return err
 	}
 
-	var yamlData interface{}
-	if err := yaml.Unmarshal(data, &yamlData); err != nil {
+	var yamlNode yaml.Node
+	if err := yaml.Unmarshal(data, &yamlNode); err != nil {
 		return err
 	}
 
-	updateKeyValue(yamlData, key, value)
+	updateKeyValue(&yamlNode, key, value)
 
-	updatedData, err := yaml.Marshal(yamlData)
+	updatedData, err := yaml.Marshal(&yamlNode)
 	if err != nil {
 		return err
 	}
@@ -81,20 +81,41 @@ func updateYAMLFile(filepath string, key, value string) error {
 	return ioutil.WriteFile(filepath, updatedData, 0644)
 }
 
-// Recursively update the key-value pair in the YAML data
-func updateKeyValue(data interface{}, targetKey, newValue string) {
-	switch data := data.(type) {
-	case map[string]interface{}:
-		for k, v := range data {
-			if k == targetKey {
-				data[k] = newValue
-			} else {
-				updateKeyValue(v, targetKey, newValue)
-			}
+// Recursively update the key-value pair in the YAML node
+func updateKeyValue(node *yaml.Node, targetKey, newValue string) {
+	if node.Kind == yaml.DocumentNode {
+		for _, child := range node.Content {
+			updateKeyValue(child, targetKey, newValue)
 		}
-	case []interface{}:
-		for _, item := range data {
-			updateKeyValue(item, targetKey, newValue)
+	}
+	if node.Kind == yaml.MappingNode {
+		for i := 0; i < len(node.Content); i += 2 {
+			k := node.Content[i]
+			v := node.Content[i+1]
+			if k.Value == targetKey {
+				// Update the value while preserving its type
+				if v.Tag == "!!int" {
+					v.Value = newValue
+					v.Tag = "!!int"
+				} else if v.Tag == "!!bool" {
+					v.Value = newValue
+					v.Tag = "!!bool"
+				} else if v.Tag == "!!float" {
+					v.Value = newValue
+					v.Tag = "!!float"
+				} else {
+					v.Value = newValue
+					v.Tag = "!!str"
+				}
+				return
+			}
+			updateKeyValue(v, targetKey, newValue)
+		}
+	}
+	if node.Kind == yaml.SequenceNode {
+		for _, child := range node.Content {
+			updateKeyValue(child, targetKey, newValue)
 		}
 	}
 }
+
